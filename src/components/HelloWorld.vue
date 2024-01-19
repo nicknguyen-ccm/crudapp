@@ -45,7 +45,7 @@ function handleSubmit() {
   }
 
 }
-function postCheck(event:typeof event, id:string, checkStatus:boolean) {
+function postCheck(event: Event, id:string, checkStatus:boolean) {
   axios.put(`https://calm-plum-jaguar-tutu.cyclic.app/todos/${id}`, {
     'isComplete': !checkStatus
   }).then((result) => {
