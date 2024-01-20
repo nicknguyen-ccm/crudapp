@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 type Post = {
   _id: string,
   isComplete: boolean,
@@ -8,8 +11,7 @@ type Post = {
 }
 type SortType = 'ascend' | 'descend' | 'none'
 let posts = ref<Post[]>([])
-const title = ref('')
-const isComplete = ref(false)
+
 const filterQuery = ref('')
 const sortMode = ref<SortType>('none')
 
@@ -23,28 +25,7 @@ function retrievePosts() {
     console.log(posts)
   }).catch((error) => {console.log('error',error)})
 }
-function handleSubmit() {
 
-  if (title.value === ''){
-    alert('invalid title')
-  } else {
-    axios.post('https://calm-plum-jaguar-tutu.cyclic.app/todos',
-    {
-      'todoName' : title.value,
-      'isComplete' : isComplete.value
-    }
-    ).then((result) => {
-      console.log(result)
-      title.value = ''
-      isComplete.value = false
-      retrievePosts()
-    }).catch((error) => {
-      console.log('error',error)
-      alert('error, not submitted')
-    })
-  }
-
-}
 function postCheck(event: Event, id:string, checkStatus:boolean) {
   axios.put(`https://calm-plum-jaguar-tutu.cyclic.app/todos/${id}`, {
     'isComplete': !checkStatus
@@ -65,6 +46,12 @@ function deleteHandler(id:string) {
   }).catch((error) => {
     console.log('error',error)
   })
+}
+
+function detailHandler(_id:string) {
+  console.log(_id)
+  router.push({name:'post', params: {id: _id}})
+
 }
 
 function sort(mode:SortType) {
@@ -133,30 +120,20 @@ const filteredPosts = computed(() => {
             />
           </td>
           <td>
+            <button v-on:click="detailHandler(post._id)">Details</button>
             <button v-on:click="deleteHandler(post._id)">Delete</button>
-          </td>
+          </td> 
         </tr>
       </table>
     </div>
-    <div class="submitForm">
-      <label>Title: </label>
-      <input type="text" v-model.trim="title" />
-      <label>Complete: </label>
-      <input type="checkbox" v-model="isComplete" />
-      <button @click="handleSubmit">Submit</button>
-    </div>
+    <RouterLink to="/form">
+    <button>Create Form</button>
+    </RouterLink>
   </div>
 </template>
 
 <style scoped>
-.submitForm {
-  display: flex;
-  flex-direction: column;
-  flex-basis: auto;
-  background-color: rgb(164, 172, 182);
-  padding: 10px;
-  border-radius: 15px;
-}
+
 table {
   background-color: rgb(182, 201, 231);
   border-radius: 15px;
