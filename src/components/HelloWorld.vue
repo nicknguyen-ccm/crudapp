@@ -3,6 +3,9 @@ import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router';
 
+defineExpose({
+  retrievePosts
+})
 const router = useRouter()
 type Post = {
   _id: string,
@@ -15,19 +18,20 @@ let posts = ref<Post[]>([])
 const filterQuery = ref('')
 const sortMode = ref<SortType>('none')
 
+const apiURL = 'https://calm-plum-jaguar-tutu.cyclic.app/'
 
 onMounted( () => {
   retrievePosts()
 })
 function retrievePosts() {
-  axios.get('https://calm-plum-jaguar-tutu.cyclic.app/todos').then((result) => {
+  axios.get(apiURL + 'todos').then((result) => {
     posts.value = result.data.data
-    console.log(posts)
+    console.log(posts.value)
   }).catch((error) => {console.log('error',error)})
 }
 
 function postCheck(event: Event, id:string, checkStatus:boolean) {
-  axios.put(`https://calm-plum-jaguar-tutu.cyclic.app/todos/${id}`, {
+  axios.put(apiURL + `todos/${id}`, {
     'isComplete': !checkStatus
   }).then((result) => {
     console.log(result)
@@ -38,7 +42,7 @@ function postCheck(event: Event, id:string, checkStatus:boolean) {
   })
 }
 function deleteHandler(id:string) {
-  axios.delete(`https://calm-plum-jaguar-tutu.cyclic.app/todos/${id}`).then((result) => {
+  axios.delete(apiURL + `todos/${id}`).then((result) => {
     posts.value = posts.value.filter((item) => {
       return item._id !== id
     })
@@ -49,9 +53,7 @@ function deleteHandler(id:string) {
 }
 
 function detailHandler(_id:string) {
-  console.log(_id)
   router.push({name:'post', params: {id: _id}})
-
 }
 
 function sort(mode:SortType) {
@@ -120,7 +122,7 @@ const filteredPosts = computed(() => {
             />
           </td>
           <td>
-            <button v-on:click="detailHandler(post._id)">Details</button>
+            <button v-on:click="detailHandler(post._id)">Edit</button>
             <button v-on:click="deleteHandler(post._id)">Delete</button>
           </td> 
         </tr>

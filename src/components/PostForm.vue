@@ -3,10 +3,11 @@ import axios from 'axios'
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useVuelidate} from '@vuelidate/core'
-import {required, alphaNum, helpers} from '@vuelidate/validators'
-
+import {required, helpers} from '@vuelidate/validators'
+// TODO: implement space validation
 
 const includeVue = (name:string) => {return name.toLowerCase().includes('vue')}
+const alphaNumSpace = (name:string) => helpers.regex(name, /^[A-Z0-9 ]*$/)
 
 const data = ref({
     todoName: '',
@@ -14,7 +15,7 @@ const data = ref({
 })
 
 const rules = {
-    todoName: {required, alphaNum, includeVue: helpers.withMessage('Must include vue in title', includeVue)},
+    todoName: {required, alphaNumSpace: helpers.withMessage('Only letters, numbers, and spaces are allowed', alphaNumSpace), includeVue: helpers.withMessage('Must include vue in title', includeVue)},
 }
 
 const router = useRouter()
