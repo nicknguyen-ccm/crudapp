@@ -71,8 +71,7 @@ function editTitle() {
   // actually deletes original post and makes a new post
   v$.value.$touch()
   if (!v$.value.$invalid) {
-    axios
-    .delete(apiURL + `todos/${post.value?._id}`)
+    axios.delete(apiURL + `todos/${post.value?._id}`)
     .then((result) => {
       console.log(result);
     })
