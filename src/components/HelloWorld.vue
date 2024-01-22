@@ -1,105 +1,123 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
-import { useRouter } from 'vue-router';
+import { ref, onMounted, computed } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
 
 defineExpose({
-  retrievePosts
-})
-const router = useRouter()
+  retrievePosts,
+});
+const router = useRouter();
 type Post = {
-  _id: string,
-  isComplete: boolean,
-  todoName: string
-}
-type SortType = 'ascend' | 'descend' | 'none'
-let posts = ref<Post[]>([])
+  _id: string;
+  isComplete: boolean;
+  todoName: string;
+};
+type SortType = "ascend" | "descend" | "none";
+let posts = ref<Post[]>([]);
 
-const filterQuery = ref('')
-const sortMode = ref<SortType>('none')
+const filterQuery = ref("");
+const sortMode = ref<SortType>("none");
 
-const apiURL = 'https://calm-plum-jaguar-tutu.cyclic.app/'
+const apiURL = "https://calm-plum-jaguar-tutu.cyclic.app/";
 
-onMounted( () => {
-  retrievePosts()
-})
+onMounted(() => {
+  retrievePosts();
+});
 function retrievePosts() {
-  axios.get(apiURL + 'todos').then((result) => {
-    posts.value = result.data.data
-    console.log(posts.value)
-  }).catch((error) => {console.log('error',error)})
-}
-
-function postCheck(event: Event, id:string, checkStatus:boolean) {
-  axios.put(apiURL + `todos/${id}`, {
-    'isComplete': !checkStatus
-  }).then((result) => {
-    console.log(result)
-  }).catch((error) => {
-    alert('check was not posted')
-    event.target.checked = !event.target.checked
-    console.log('error check not updated',error)
-  })
-}
-function deleteHandler(id:string) {
-  axios.delete(apiURL + `todos/${id}`).then((result) => {
-    posts.value = posts.value.filter((item) => {
-      return item._id !== id
+  axios
+    .get(apiURL + "todos")
+    .then((result) => {
+      posts.value = result.data.data;
+      console.log(posts.value);
     })
-    console.log(result)
-  }).catch((error) => {
-    console.log('error',error)
-  })
+    .catch((error) => {
+      console.log("error", error);
+    });
 }
 
-function detailHandler(_id:string) {
-  router.push({name:'post', params: {id: _id}})
+function postCheck(event: Event, id: string, checkStatus: boolean) {
+  axios
+    .put(apiURL + `todos/${id}`, {
+      isComplete: !checkStatus,
+    })
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((error) => {
+      alert("check was not posted");
+      event.target.checked = !event.target.checked;
+      console.log("error check not updated", error);
+    });
+}
+function deleteHandler(id: string) {
+  axios
+    .delete(apiURL + `todos/${id}`)
+    .then((result) => {
+      posts.value = posts.value.filter((item) => {
+        return item._id !== id;
+      });
+      console.log(result);
+    })
+    .catch((error) => {
+      console.log("error", error);
+    });
 }
 
-function sort(mode:SortType) {
-  sortMode.value = mode
+function detailHandler(_id: string) {
+  router.push({ name: "post", params: { id: _id } });
 }
 
+function sort(mode: SortType) {
+  sortMode.value = mode;
+}
 
 const filteredPosts = computed(() => {
-  if (sortMode.value === 'none') {
+  if (sortMode.value === "none") {
     return posts.value.filter((post) => {
-      return post.todoName.includes(filterQuery.value.toLowerCase())
-  })} else if (sortMode.value === 'ascend') {
-    return posts.value.filter((post) => {
-      return post.todoName.includes(filterQuery.value.toLowerCase())
-  }).sort((a,b) => {
-      if (a.todoName.toLowerCase()  < b.todoName.toLowerCase()) {
-        return -1;
-      }
-      if (a.todoName.toLowerCase() > b.todoName.toLowerCase()) {
-        return 1;
-      }
-      return 0;
-    })
+      return post.todoName.includes(filterQuery.value.toLowerCase());
+    });
+  } else if (sortMode.value === "ascend") {
+    return posts.value
+      .filter((post) => {
+        return post.todoName.includes(filterQuery.value.toLowerCase());
+      })
+      .sort((a, b) => {
+        if (a.todoName.toLowerCase() < b.todoName.toLowerCase()) {
+          return -1;
+        }
+        if (a.todoName.toLowerCase() > b.todoName.toLowerCase()) {
+          return 1;
+        }
+        return 0;
+      });
   } else {
-    return posts.value.filter((post) => {
-      return post.todoName.includes(filterQuery.value.toLowerCase())
-    }).sort((a,b) => {
-      if (a.todoName.toLowerCase() < b.todoName.toLowerCase() ) {
-        return 1;
-      }
-      if (a.todoName.toLowerCase()  > b.todoName.toLowerCase() ) {
-        return -1;
-      }
-      return 0;
-    })
+    return posts.value
+      .filter((post) => {
+        return post.todoName.includes(filterQuery.value.toLowerCase());
+      })
+      .sort((a, b) => {
+        if (a.todoName.toLowerCase() < b.todoName.toLowerCase()) {
+          return 1;
+        }
+        if (a.todoName.toLowerCase() > b.todoName.toLowerCase()) {
+          return -1;
+        }
+        return 0;
+      });
   }
-  }
-
-)
+});
 </script>
 
 <template>
   <div class="formAndTable">
     <div>
-      <label>Filter: </label>
-      <input type="text" v-model="filterQuery" />
+      <div style="margin-left: 10px">
+        <label>Filter: </label>
+        <input type="text" v-model="filterQuery" />
+        <RouterLink to="/form">
+          <button>Create a Post</button>
+        </RouterLink>
+      </div>
       <table>
         <th>
           Title
@@ -124,31 +142,25 @@ const filteredPosts = computed(() => {
           <td>
             <button v-on:click="detailHandler(post._id)">Edit</button>
             <button v-on:click="deleteHandler(post._id)">Delete</button>
-          </td> 
+          </td>
         </tr>
       </table>
     </div>
-    <RouterLink to="/form">
-    <button>Create Form</button>
-    </RouterLink>
   </div>
 </template>
 
 <style scoped>
-
 table {
   background-color: rgb(182, 201, 231);
   border-radius: 15px;
   padding: 10px;
 }
-.th {
-  background-color: rgb(202, 164, 164);
-}
+
 .formAndTable {
   display: flex;
   background-color: rgb(184, 189, 197);
   border-radius: 15px;
-  padding: 10px;
+  padding: 20px;
   gap: 20px;
 }
 </style>
