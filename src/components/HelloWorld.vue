@@ -68,11 +68,11 @@ const sortedPosts = computed(() => {
   if (sortMode.value === "none") {
     return filteredPosts.value
   } else if (sortMode.value === 'ascend') {
-    return filteredPosts.value.slice(0).sort((a,b) => a.todoName.localeCompare(b.todoName)).reverse()
+    return filteredPosts.value.toSorted((a,b) => a.todoName.localeCompare(b.todoName)).reverse()
   } else {
-    return filteredPosts.value.slice(0).sort((a,b) => a.todoName.localeCompare(b.todoName))
+    return filteredPosts.value.toSorted((a,b) => a.todoName.localeCompare(b.todoName))
   }
-})
+})  
 
 const filteredPosts = computed(() => {
   return posts.value.filter((post) => post.todoName.includes(filterQuery.value.toLowerCase()))
@@ -110,13 +110,13 @@ onMounted(() => {
           <td>
             <input
               type="checkbox"
-              v-bind:checked="post.isComplete"
-              v-on:change="checkHandler($event, post._id, post.isComplete)"
+              :checked="post.isComplete"
+              @change="checkHandler($event, post._id, post.isComplete)"
             />
           </td>
           <td>
-            <button v-on:click="detailHandler(post._id)">Edit</button>
-            <button v-on:click="deleteHandler(post._id)">Delete</button>
+            <button @click="detailHandler(post._id)">Edit</button>
+            <button @click="deleteHandler(post._id)">Delete</button>
           </td>
         </tr>
       </table>

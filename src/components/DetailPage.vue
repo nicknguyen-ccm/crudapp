@@ -74,18 +74,10 @@ onMounted(() => {
 });
 
 const post = computed(() => {
-  return posts.value.find((item) => {
-    return item._id === id.value;
-  });
+  return posts.value.find((item) => item._id === id.value);
 });
 
-const validPost = computed(() => {
-  if (post !== undefined) {
-    return true;
-  } else {
-    return false;
-  }
-});
+const validPost = computed(() => post.value !== undefined);
 </script>
 
 <template>
@@ -101,7 +93,7 @@ const validPost = computed(() => {
       Complete:
       <input
         type="checkbox"
-        v-bind:checked="post?.isComplete"
+        :checked="post?.isComplete"
         v-model="data.isComplete"
       />
     </p>
