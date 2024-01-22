@@ -3,26 +3,22 @@ import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
-defineExpose({
-  retrievePosts,
-});
-const router = useRouter();
+
+
 type Post = {
   _id: string;
   isComplete: boolean;
   todoName: string;
 };
 type SortType = "ascend" | "descend" | "none";
-let posts = ref<Post[]>([]);
-
-const filterQuery = ref("");
-const sortMode = ref<SortType>("none");
 
 const apiURL = "https://calm-plum-jaguar-tutu.cyclic.app/";
 
-onMounted(() => {
-  retrievePosts();
-});
+let posts = ref<Post[]>([]);
+const filterQuery = ref("");
+const sortMode = ref<SortType>("none");
+const router = useRouter();
+
 function retrievePosts() {
   axios
     .get(apiURL + "todos")
@@ -35,7 +31,7 @@ function retrievePosts() {
     });
 }
 
-function postCheck(event: Event, id: string, checkStatus: boolean) {
+function checkHandler(event: Event, id: string, checkStatus: boolean) {
   axios
     .put(apiURL + `todos/${id}`, {
       isComplete: !checkStatus,
@@ -49,6 +45,7 @@ function postCheck(event: Event, id: string, checkStatus: boolean) {
       console.log("error check not updated", error);
     });
 }
+
 function deleteHandler(id: string) {
   axios
     .delete(apiURL + `todos/${id}`)
@@ -67,44 +64,22 @@ function detailHandler(_id: string) {
   router.push({ name: "post", params: { id: _id } });
 }
 
-function sort(mode: SortType) {
-  sortMode.value = mode;
-}
+const sortedPosts = computed(() => {
+  if (sortMode.value === "none") {
+    return filteredPosts.value
+  } else if (sortMode.value === 'ascend') {
+    return filteredPosts.value.slice(0).sort((a,b) => {return a.todoName.localeCompare(b.todoName) }).reverse()
+  } else {
+    return filteredPosts.value.slice(0).sort((a,b) => {return a.todoName.localeCompare(b.todoName) })
+  }
+})
 
 const filteredPosts = computed(() => {
-  if (sortMode.value === "none") {
-    return posts.value.filter((post) => {
-      return post.todoName.includes(filterQuery.value.toLowerCase());
-    });
-  } else if (sortMode.value === "ascend") {
-    return posts.value
-      .filter((post) => {
-        return post.todoName.includes(filterQuery.value.toLowerCase());
-      })
-      .sort((a, b) => {
-        if (a.todoName.toLowerCase() < b.todoName.toLowerCase()) {
-          return -1;
-        }
-        if (a.todoName.toLowerCase() > b.todoName.toLowerCase()) {
-          return 1;
-        }
-        return 0;
-      });
-  } else {
-    return posts.value
-      .filter((post) => {
-        return post.todoName.includes(filterQuery.value.toLowerCase());
-      })
-      .sort((a, b) => {
-        if (a.todoName.toLowerCase() < b.todoName.toLowerCase()) {
-          return 1;
-        }
-        if (a.todoName.toLowerCase() > b.todoName.toLowerCase()) {
-          return -1;
-        }
-        return 0;
-      });
-  }
+  return posts.value.filter((post) => post.todoName.includes(filterQuery.value.toLowerCase()))
+});
+
+onMounted(() => {
+  retrievePosts();
 });
 </script>
 
@@ -121,22 +96,22 @@ const filteredPosts = computed(() => {
       <table>
         <th>
           Title
-          <button @click="sort('descend')">
+          <button @click="sortMode='descend'">
             <font-awesome-icon :icon="['fas', 'arrow-up']" />
           </button>
-          <button @click="sort('ascend')">
+          <button @click="sortMode='ascend'">
             <font-awesome-icon :icon="['fas', 'arrow-down']" />
           </button>
         </th>
         <th>Complete</th>
         <th>Actions</th>
-        <tr v-for="post in filteredPosts" :key="post._id">
+        <tr v-for="post in sortedPosts" :key="post._id">
           <td>{{ post.todoName }}</td>
           <td>
             <input
               type="checkbox"
               v-bind:checked="post.isComplete"
-              v-on:change="postCheck($event, post._id, post.isComplete)"
+              v-on:change="checkHandler($event, post._id, post.isComplete)"
             />
           </td>
           <td>

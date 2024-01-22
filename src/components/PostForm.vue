@@ -22,11 +22,12 @@ const rules = {
 
 const router = useRouter()
 const v$ = useVuelidate(rules, data)
+
+
 function handleSubmit() {
   v$.value.$touch()
   if (!v$.value.$invalid) {
-    axios
-      .post("https://calm-plum-jaguar-tutu.cyclic.app/todos", data.value)
+    axios.post("https://calm-plum-jaguar-tutu.cyclic.app/todos", data.value)
       .then(() => {
         router.push('/')
       })
