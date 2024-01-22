@@ -22,19 +22,17 @@ const data = ref({
 
 const v$ = useVuelidate(rules, data)
 
-const route = useRoute();
-const router = useRouter()
-const id = ref();
-const posts = ref<Post[]>([]);
-
-
-
-const apiURL = "https://calm-plum-jaguar-tutu.cyclic.app/";
 type Post = {
   _id: string;
   isComplete: boolean;
   todoName: string;
 };
+
+const route = useRoute();
+const router = useRouter()
+const id = ref();
+const posts = ref<Post[]>([])
+const apiURL = "https://calm-plum-jaguar-tutu.cyclic.app/";
 
 function retrievePosts() {
   axios
@@ -47,25 +45,6 @@ function retrievePosts() {
       console.log("error", error);
     });
 }
-
-onMounted(() => {
-  retrievePosts();
-  id.value = route.params.id;
-});
-
-const post = computed(() => {
-  return posts.value.find((item) => {
-    return item._id === id.value;
-  });
-});
-
-const validPost = computed(() => {
-  if (post !== undefined) {
-    return true;
-  } else {
-    return false;
-  }
-});
 
 function editTitle() {
   // actually deletes original post and makes a new post
@@ -86,14 +65,30 @@ function editTitle() {
         }).catch((error) => {
             console.log("post error", error)
         });
-
   }
-
 }
+
+onMounted(() => {
+  retrievePosts();
+  id.value = route.params.id;
+});
+
+const post = computed(() => {
+  return posts.value.find((item) => {
+    return item._id === id.value;
+  });
+});
+
+const validPost = computed(() => {
+  if (post !== undefined) {
+    return true;
+  } else {
+    return false;
+  }
+});
 </script>
 
 <template>
-
   <div class="post" v-if="validPost">
     <h3>Post Details</h3>
     <p>

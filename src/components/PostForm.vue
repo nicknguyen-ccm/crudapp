@@ -5,7 +5,6 @@ import {useRouter} from 'vue-router'
 import {useVuelidate} from '@vuelidate/core'
 import {required, helpers} from '@vuelidate/validators'
 
-
 const includeVue = (name:string) => {return name.toLowerCase().includes('vue')}
 const alphaNumSpace = helpers.regex(/^[A-Za-z0-9 ]*$/)
 
@@ -23,7 +22,6 @@ const rules = {
 const router = useRouter()
 const v$ = useVuelidate(rules, data)
 
-
 function handleSubmit() {
   v$.value.$touch()
   if (!v$.value.$invalid) {
@@ -37,7 +35,6 @@ function handleSubmit() {
       });
   }
 }
-
 </script>
 
 <template>

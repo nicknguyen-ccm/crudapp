@@ -68,9 +68,9 @@ const sortedPosts = computed(() => {
   if (sortMode.value === "none") {
     return filteredPosts.value
   } else if (sortMode.value === 'ascend') {
-    return filteredPosts.value.slice(0).sort((a,b) => {return a.todoName.localeCompare(b.todoName) }).reverse()
+    return filteredPosts.value.slice(0).sort((a,b) => a.todoName.localeCompare(b.todoName)).reverse()
   } else {
-    return filteredPosts.value.slice(0).sort((a,b) => {return a.todoName.localeCompare(b.todoName) })
+    return filteredPosts.value.slice(0).sort((a,b) => a.todoName.localeCompare(b.todoName))
   }
 })
 
